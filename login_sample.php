@@ -1,5 +1,12 @@
 <?php
 
+	//loo ab-i ühenduse
+	require_once("../config.php");
+	$database = "if15_arkadi_3";
+	$mysqli = new mysqli ($servername, $username, $password, $database);
+	
+	
+	
   // muuutujad errorite jaoks
 	$email_error = "";
 	$password_error = "";
@@ -62,8 +69,17 @@
 			}
 
 			if(	$create_email_error == "" && $create_password_error == ""){
-				echo "Võib kasutajat luua! Kasutajanimi on ".$create_email." ja parool on ".$create_password;
-      }
+				
+				$hash = hash("sha512", $create_password);
+				
+				echo "Võib kasutajat luua! Kasutajanimi on ".$create_email." ja parool on ".$create_password." ja räsi on ".$hash;
+				
+				$stmt = $mysqli->prepare("INSERT INTO user_sample (email, password) VALUES (?,?)");
+				$stmt->bind_param("ss", $create_email, $hash);
+				$stmt->execute();
+				$stmt->close();
+      }			
+				
 
     } // create if end
 
@@ -77,6 +93,8 @@
   	return $data;
   }
 
+	//paneme ühenduse kinni
+	$mysqli->close();
 ?>
 <!DOCTYPE html>
 <html>
